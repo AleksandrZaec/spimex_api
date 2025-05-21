@@ -5,7 +5,7 @@ from datetime import date
 from app.models import SpimexTradingResults
 
 
-async def get_last_trading_dates(session: AsyncSession, limit: int) -> List[date]:
+async def get_last_trading_dates(session: AsyncSession, limit: int) -> list[date]:
     result = await session.execute(
         select(SpimexTradingResults.date)
         .distinct()
@@ -22,7 +22,7 @@ async def get_dynamics(
         oil_id: str | None = None,
         delivery_type_id: str | None = None,
         delivery_basis_id: str | None = None,
-):
+) -> List[SpimexTradingResults]:
     query = select(SpimexTradingResults).where(
         SpimexTradingResults.date.between(start_date, end_date)
     )
@@ -44,7 +44,7 @@ async def get_trading_results(
         delivery_type_id: str | None = None,
         delivery_basis_id: str | None = None,
         limit: int = 100
-):
+) -> List[SpimexTradingResults]:
     query = select(SpimexTradingResults).order_by(desc(SpimexTradingResults.date))
     if oil_id:
         query = query.where(SpimexTradingResults.oil_id == oil_id)
