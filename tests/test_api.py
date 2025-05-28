@@ -2,15 +2,14 @@ import pytest
 from httpx import AsyncClient
 
 
-
-
 @pytest.mark.asyncio
 class TestLastTradingDatesAPI:
     async def test_valid_limit(self, ac: AsyncClient, test_cache):
         response = await ac.get("/trading/last_trading_dates?limit=5")
         assert response.status_code == 200
-        assert isinstance(response.json(), list)
-        assert len(response.json()) <= 5
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) <= 5
 
     @pytest.mark.parametrize(
         "query, loc, err_type, msg_part",
@@ -70,14 +69,13 @@ class TestDynamicsAPI:
         assert any(e["loc"] == error_loc for e in errors)
 
 
-
-
 @pytest.mark.asyncio
 class TestTradingResultsAPI:
     async def test_trading_results_success(self, ac: AsyncClient, test_cache):
         response = await ac.get("/trading/trading_results")
         assert response.status_code == 200
-        assert isinstance(response.json(), list)
+        data = response.json()
+        assert isinstance(data, list)
 
     async def test_trading_results_with_valid_params(self, ac: AsyncClient, test_cache):
         params = {
@@ -87,7 +85,8 @@ class TestTradingResultsAPI:
         }
         response = await ac.get("/trading/trading_results", params=params)
         assert response.status_code == 200
-        assert isinstance(response.json(), list)
+        data = response.json()
+        assert isinstance(data, list)
 
     async def test_trading_results_invalid_params(self, ac: AsyncClient):
         response = await ac.get("/trading/trading_results", params={"oil_id": {"invalid": "value"}})
@@ -95,5 +94,6 @@ class TestTradingResultsAPI:
 
         response = await ac.get("/trading/trading_results", params={"unknown_param": "value"})
         assert response.status_code == 200
-        assert isinstance(response.json(), list)
+        data = response.json()
+        assert isinstance(data, list)
 

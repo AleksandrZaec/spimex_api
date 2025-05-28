@@ -21,7 +21,7 @@ def ensure_test_env():
     assert mode == "TEST", f"Тесты запускаются только при MODE=TEST, а сейчас MODE={mode!r}"
 
 
-@pytest_asyncio.fixture  # all
+@pytest_asyncio.fixture(scope="function")  # all
 async def test_session():
     engine = create_async_engine(settings.DB_URL, echo=False)
     async_session = async_sessionmaker(bind=engine, class_=AsyncSession)
@@ -32,14 +32,14 @@ async def test_session():
     await engine.dispose()
 
 
-@pytest.fixture(scope="class")  # crud
+@pytest_asyncio.fixture(scope="class")  # crud
 async def date_range():
     end = date.today()
     start = end - timedelta(days=30)
     return start, end
 
 
-@pytest.fixture(scope="class")  # crud
+@pytest_asyncio.fixture(scope="class")  # crud
 async def filters():
     return {
         "oil_id": "BRN",
@@ -48,7 +48,7 @@ async def filters():
     }
 
 
-@pytest.fixture  # api
+@pytest_asyncio.fixture(scope="function")  # api
 async def ac():
     async with AsyncClient(
             transport=ASGITransport(app=app),
@@ -57,7 +57,7 @@ async def ac():
         yield client
 
 
-@pytest.fixture()  # all
+@pytest_asyncio.fixture(scope="function")  # all
 async def test_cache():
     test_redis_client = redis.from_url(settings.REDIS_URL, encoding="utf-8", decode_responses=True)
     app.state.redis = test_redis_client
@@ -67,7 +67,7 @@ async def test_cache():
     await test_redis_client.aclose()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(scope="function")
 async def example_result_item():
     return {
         "id": 1,
@@ -86,7 +86,7 @@ async def example_result_item():
     }
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(scope="function")
 def example_item():
     return {
         "date": "2024-01-01",
